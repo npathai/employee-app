@@ -17,13 +17,12 @@ const saveProjectBtn = document.querySelector('.save-project-btn')
 saveEmployeeBtn.addEventListener('click', addEmployee)
 saveProjectBtn.addEventListener('click', addProject)
 
-
+employees = []
 projects = []
 
-document.onload = function () {
+window.onload = function () {
     loadEmployees()
-    showEmployees(employees)
-    showProjects(projects)
+    loadProjects()
 }
 
 // Functions
@@ -34,10 +33,23 @@ function addEmployee() {
         employeePhone: employeePhone.value,
         employeeProjectKey: employeeProjectKey.value
     }
-    employees.push(employee)
-    console.log(employees)
-    $(employeeModal).modal('hide')
-    showEmployees(employees)
+
+    let xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState === XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+            if (xmlhttp.status === 201) {
+                $(employeeModal).modal('hide')
+                employees.push(employee)
+                showEmployees(employees)
+            }
+            else {
+                alert('There was an error saving employee');
+            }
+        }
+    };
+
+    xmlhttp.open("POST", "https://api.mocki.io/v1/6a5f1cea", true);
+    xmlhttp.send(JSON.stringify(employee));
 }
 
 
@@ -48,16 +60,44 @@ function addProject() {
         projectKey: projectKey.value,
         projectTitle: projectTitle.value
     }
-    projects.push(project)
-    console.log(projects)
-    $(projectModal).modal('hide')
-    showProjects(projects)
+
+    let xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState === XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+            if (xmlhttp.status === 201) {
+                $(projectModal).modal('hide')
+                projects.push(project)
+                showEmployees(project)
+            }
+            else {
+                alert('There was an error saving project');
+            }
+        }
+    };
+
+    xmlhttp.open("POST", "https://api.mocki.io/v1/6a5f1cea", true);
+    xmlhttp.send(JSON.stringify(project));
 }
 
 
-// https://ce14fd94-751f-42b3-9330-483c7f544456.mock.pstmn.io
 function loadEmployees() {
+    let employees = []
+    let xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState === XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+            if (xmlhttp.status === 200) {
+                employees = JSON.parse(xmlhttp.response)
+                console.log(employees)
+                showEmployees(employees)
+            }
+            else {
+                alert('There was an error loading employees');
+            }
+        }
+    };
 
+    xmlhttp.open("GET", "https://api.mocki.io/v1/f69c7016", true);
+    xmlhttp.send();
 }
 
 function showEmployees(employees) {
@@ -84,6 +124,27 @@ function showEmployees(employees) {
 
         employeesTable.appendChild(employeeElement)
     }
+}
+
+
+function loadProjects() {
+    let projects = []
+    let xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState === XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+            if (xmlhttp.status === 200) {
+                projects = JSON.parse(xmlhttp.response)
+                console.log(projects)
+                showProjects(projects)
+            }
+            else {
+                alert('There was an error loading employees');
+            }
+        }
+    };
+
+    xmlhttp.open("GET", "https://api.mocki.io/v1/85e8eca0", true);
+    xmlhttp.send();
 }
 
 function showProjects(projects) {
