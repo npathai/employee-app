@@ -17,8 +17,8 @@ const saveProjectBtn = document.querySelector('.save-project-btn')
 saveEmployeeBtn.addEventListener('click', addEmployee)
 saveProjectBtn.addEventListener('click', addProject)
 
-employees = []
-projects = []
+const employees = [];
+const projects = []
 
 window.onload = function () {
     loadEmployees()
@@ -47,15 +47,14 @@ function addEmployee() {
             }
         }
     };
-
-    xmlhttp.open("POST", "https://api.mocki.io/v1/6a5f1cea", true);
+    xmlhttp.open("POST", "http://localhost:8080/employees", true);
+    xmlhttp.setRequestHeader('Content-Type', 'application/json');
+    xmlhttp.setRequestHeader('Accept', 'application/json');
     xmlhttp.send(JSON.stringify(employee));
 }
 
 
 function addProject() {
-    console.log(projectTitle.value)
-    console.log(projectKey.value)
     let project = {
         projectKey: projectKey.value,
         projectTitle: projectTitle.value
@@ -67,7 +66,7 @@ function addProject() {
             if (xmlhttp.status === 201) {
                 $(projectModal).modal('hide')
                 projects.push(project)
-                showEmployees(project)
+                showProjects(projects)
             }
             else {
                 alert('There was an error saving project');
@@ -75,19 +74,22 @@ function addProject() {
         }
     };
 
-    xmlhttp.open("POST", "https://api.mocki.io/v1/6a5f1cea", true);
+    xmlhttp.open("POST", "http://localhost:8080/projects", true);
+    xmlhttp.setRequestHeader('Accept', 'application/json');
+    xmlhttp.setRequestHeader('Content-Type', 'application/json');
     xmlhttp.send(JSON.stringify(project));
 }
 
 
 function loadEmployees() {
-    let employees = []
     let xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState === XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
             if (xmlhttp.status === 200) {
-                employees = JSON.parse(xmlhttp.response)
-                console.log(employees)
+                let response = JSON.parse(xmlhttp.response)
+                for (let employee of response) {
+                    employees.push(employee)
+                }
                 showEmployees(employees)
             }
             else {
@@ -96,7 +98,7 @@ function loadEmployees() {
         }
     };
 
-    xmlhttp.open("GET", "https://api.mocki.io/v1/f69c7016", true);
+    xmlhttp.open("GET", "http://localhost:8080/employees", true);
     xmlhttp.send();
 }
 
@@ -128,12 +130,14 @@ function showEmployees(employees) {
 
 
 function loadProjects() {
-    let projects = []
     let xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState === XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
             if (xmlhttp.status === 200) {
-                projects = JSON.parse(xmlhttp.response)
+                let response = JSON.parse(xmlhttp.response)
+                for (let project of response) {
+                    projects.push(project)
+                }
                 console.log(projects)
                 showProjects(projects)
             }
@@ -143,7 +147,7 @@ function loadProjects() {
         }
     };
 
-    xmlhttp.open("GET", "https://api.mocki.io/v1/85e8eca0", true);
+    xmlhttp.open("GET", "http://localhost:8080/projects", true);
     xmlhttp.send();
 }
 
